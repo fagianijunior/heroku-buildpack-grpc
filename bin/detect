@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo "heroku-buildpack-grpc"
+exit 0

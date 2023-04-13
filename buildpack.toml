@@ -1,0 +1,21 @@
+api = "0.5"
+
+[buildpack]
+id = "fagianijunior/grpc"
+version = "0.0.1"
+name = "GRPC Cloud Native Buildpack"
+homepage = "https://github.com/fagianijunior/heroku-buildpack-grpc"
+description = "Install the grpc php extencion to your build."
+keywords = ["grpc", "php", "pecl"]
+
+[[buildpack.licenses]]
+type = "MIT"
+
+[[stacks]]
+id = "heroku-18"
+
+[[stacks]]
+id = "heroku-20"
+
+[[stacks]]
+id = "io.buildpacks.stacks.bionic"

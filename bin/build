@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -e
+
+echo "-----> Install heroku-buildpack-grpc"
+
+name=grpc
+version=1.53.0
+
+php_dir=/app/.heroku/php/etc/php
+
+ls $php_dir
+ls $php_dir/conf.d
+
+echo "extension=$name.so" > $php_dir/conf.d/$name.ini
+
+build_dir="$php_dir/ext"
+
+
+mkdir -p "$build_dir/$name"
+curl -fsSL "https://pecl.php.net/get/$name-$version.tgz" | tar xvz -C "$build_dir/$name" --strip 1
+
+cd "$build_dir/$name"
+phpize
+./configure --enable-grpc
+make
+make install
+
+echo "php -i | grep grpc"
+php -i | grep grpc
+
+echo "-----> Install heroku-buildpack-grpc finished"
