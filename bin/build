@@ -1,6 +1,5 @@
-#!/bin/bash
-
-set -e
+#!/usr/bin/env bash
+set -eu
 
 echo "-----> Install heroku-buildpack-grpc"
 
@@ -9,22 +8,39 @@ version=1.53.0
 
 php_dir=/app/.heroku/php/etc/php
 
-ls $php_dir
-ls $php_dir/conf.d
+layers_dir=$1
+mkdir -p "$layers_dir/$name"
 
 echo "extension=$name.so" > $php_dir/conf.d/$name.ini
 
-build_dir="$php_dir/ext"
+# Store which STACK we are running on in the cache to bust the cache if it changes
+if [ -f $layers_dir/$name/STACK ]; then
+  CACHED_STACK=$(cat "$layers_dir/$name/STACK")
+else
+  CACHED_STACK=$CNB_STACK_ID
+fi
 
+# Ensure we store the STACK in the cache for next time.
+echo "$CNB_STACK_ID" > "$layers_dir/$name/STACK"
 
-mkdir -p "$build_dir/$name"
-curl -fsSL "https://pecl.php.net/get/$name-$version.tgz" | tar xvz -C "$build_dir/$name" --strip 1
+echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+if [ -f $layers_dir/$name ] && [[ $CACHED_STACK == $CNB_STACK_ID ]] ; then
+  echo "---> GRPC and stack look the same, reusing cache"
+else
+  echo "---> Installing GRPC"
+  
+  echo "$version" > "$layers_dir/$name/version"
 
-cd "$build_dir/$name"
-phpize
-./configure --enable-grpc
-make
-make install
+  echo -e '[types]\ncache = true\nlaunch = true' > "$layers_dir/$name.toml"
+  curl -fsSL "https://pecl.php.net/get/$name-$version.tgz" | tar xvz -C "$layers_dir/$name" --strip 1
+
+  cd "$layers_dir/$name"
+  phpize
+  ./configure --enable-grpc
+  make
+  DESTDIR=$layers_dir/$name make install
+fi
+
 
 echo "php -i | grep grpc"
 php -i | grep grpc
