@@ -26,6 +26,8 @@ echo "$CNB_STACK_ID" > "$layers_dir/$name/STACK"
 echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 if [ -f $layers_dir/$name ] && [[ $CACHED_STACK == $CNB_STACK_ID ]] ; then
   echo "---> GRPC and stack look the same, reusing cache"
+  cd "$layers_dir/$name"  
+  DESTDIR=$layers_dir/$name make install
 else
   echo "---> Installing GRPC"
   
