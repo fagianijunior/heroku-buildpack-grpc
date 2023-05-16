@@ -2,7 +2,7 @@ api = "0.5"
 
 [buildpack]
 id = "fagianijunior/grpc"
-version = "0.0.1"
+version = "0.0.2"
 name = "GRPC Cloud Native Buildpack"
 homepage = "https://github.com/fagianijunior/heroku-buildpack-grpc"
 description = "Install the grpc php extencion to your build."
